@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{{url_for('static' , filename = 'style.css')}}?q=128049780">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+
+
+</head>
+<body>
+    <div id = "app">
+        <div id= "c_id" value = "{{ data.customer_id }}"></div>
+
+        {% include 'nav.html' %}
+        
+        <div class="container py-5">
+            <table class="table table-bordered table-hover">
+                <h2 class="text-center py-3">Service Locations</h2>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>St Address</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Zipcode</th>
+                    <th>Take Over Date</th>
+                    <th>Sq Footage</th>
+                    <th>Bedroom Count</th>
+                    <th>Occupant Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(location,index) in serviceLocationData">
+                    <td>[[ location[0] ]]</td>
+                    <td>[[ location[1] ]]</td>
+                    <td>[[ location[2] ]]</td>
+                    <td>[[ location[3] ]]</td>
+                    <td>[[ location[4] ]]</td>
+                    <td>[[ location[5] ]]</td>
+                    <td>[[ location[6] ]]</td>
+                    <td>[[ location[7] ]]</td>
+                    <td>[[ location[8] ]]</td>
+                    <td><button type="button" class="btn btn-danger" @click="deleteServiceLocation(location[0])">Delete</button></td>
+                    <td><button type="button" class="btn btn-success" @click="deviceRedirect(location[0])">Devices</button></td>
+                  </tr>
+                </tbody>            
+            </table>
+
+            <div class="text-center">
+                <button type="button" class="text-center btn btn-info" data-toggle="modal" data-target="#addServiceLocationModal"> Add Service Location</button>
+            </div>
+            
+            
+            
+            
+            <!-- The Modal -->
+            <div class="modal" id="addServiceLocationModal">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title">Add Service Location</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    
+                    <form @submit.prevent="submitServiceLocationForm">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                            <div class="form-group">
+                                <label for="usr">St Address:</label>
+                                <input type="text" class="form-control" id="usr" name="name" v-model="serviceLocationFormData.stAddress">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">City:</label>
+                                <input type="text" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.city">
+                            </div>
+                            <div class="form-group">
+                                <label for="pwd">State:</label>
+                                <input type="text" class="form-control" id="pwd" name="password" v-model="serviceLocationFormData.state">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">Zipcode:</label>
+                                <input type="text" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.zipcode">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">Take Over Date:</label>
+                                <input type="date" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.takeoverDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">Sq Footage:</label>
+                                <input type="text" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.sqFootage">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">Bedroom Count:</label>
+                                <input type="number" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.bedroomCount">
+                            </div>
+                            <div class="form-group">
+                                <label for="usr">Occupant Count:</label>
+                                <input type="number" class="form-control" id="usr" name="username" v-model="serviceLocationFormData.occupantCount">
+                            </div>
+                    </div>
+                    
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+
+                    </form>
+                    
+                </div>
+                </div>
+            </div>
+
+
+            <form @submit.prevent="updateBarChart()">
+                <div class="form-group">
+                    <label for="usr">Month:</label>
+                    <select class="form-control" id="sel1" name="sellist1" v-model="barChartQueryData.month">
+                        <option v-for="month in monthList" :value ="month.id">[[ month.title ]]</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="usr">Year:</label>
+                    <select class="form-control" id="sel1" name="sellist1" v-model="barChartQueryData.year">
+                        <option v-for="year in yearList" :value ="year.id">[[ year.title ]]</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+            <div class="text-center m-5">
+                <canvas id="pieChart" style="max-width: 600px;"></canvas>
+                <canvas id="barChart" style="max-width: 600px;"></canvas>
+            </div>
+            
+
+
+        </div>
+        
+        
+
+        {% include 'footer.html' %}
+    </div>
+
+    <script>
+        var vueObj = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                age : 12,
+                skillsData:[
+                {id: 1 , title:'Unreal Engine'},
+                {id: 2 , title:'HTML5 CSS3 JS'},
+                {id: 3 , title:'Unity'},
+                {id: 4 , title:'Ajax'},
+                {id: 5 , title:'JQuery'},
+                {id: 6 , title:'Flask'},
+                {id: 7 , title:'Django'},
+                {id: 8 , title:'Php'},
+                {id: 9 , title:'Node JS'},
+                {id: 10 , title:'React Native'}, 
+                ],
+                monthList: [
+                    {id: 1 , title:'January'},
+                    {id: 2 , title:'February'},
+                    {id: 3 , title:'March'},
+                    {id: 4 , title:'April'},
+                    {id: 5 , title:'May'},
+                    {id: 6 , title:'June'},
+                    {id: 7 , title:'July'},
+                    {id: 8 , title:'August'},
+                    {id: 9 , title:'September'},
+                    {id: 10 , title:'October'}, 
+                    {id: 11 , title:'November'}, 
+                    {id: 12 , title:'December'}, 
+                ],
+                yearList: [
+                    {id: 2023 , title:'2023'},
+                    {id: 2022 , title:'2022'},
+                    {id: 2021 , title:'2021'},
+                    {id: 2020 , title:'2020'},
+                    {id: 2019 , title:'2019'},
+                ],
+                signupFormData: {
+                    name: '',
+                    email: '',
+                    password: '',
+                    stAddress: '',
+                    city: '',
+                    state: '',
+                    zipcode: 0,
+                },
+                loginFormData: {
+                    email: '',
+                    password: ''
+                },
+                serviceLocationFormData: {
+                    stAddress: '',
+                    city: '',
+                    state: '',
+                    zipcode: '',
+                    takeoverDate: '',
+                    sqFootage: '',
+                    bedroomCount: '',
+                    occupantCount: '',
+                },
+                barChartQueryData: {
+                    month: null,
+                    year: null,
+                },
+                barChart: null,
+                serviceLocationData: null,
+                chartData: {
+                    labels: ['Red', 'Blue', 'Yellow'],
+                    datasets: [{
+                        label: 'Installed Devices Count',
+                        data: [10, 20, 15],
+                        backgroundColor: null,
+                    }],
+                },
+                barChartData: {
+                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple'],
+                    datasets: [{
+                        label: 'Service Location Energy Consumption Chart',
+                        data: [12, 19, 3, 5, 2],
+                        backgroundColor: [
+                            'red',
+                            'blue',
+                            'yellow',
+                            'green',
+                            'purple',
+                        ],
+                    }],
+                },
+            },
+            mounted() {
+            },
+            created: async function(){
+                const gResponse = await fetch("http://127.0.0.1:8989/servicelocationdata");
+                const gObject = await gResponse.json();
+                this.serviceLocationData = gObject.servicelocations;
+                console.log(this.serviceLocationData);
+
+                var c_id = document.getElementById('c_id').getAttribute('value');
+                const formData = new FormData();
+                formData.append('c_id', c_id);
+                formData.append('month', 12);
+                formData.append('year', 2023);
+
+                await axios.post('http://127.0.0.1:8989/fetchservicelocationpiedata', formData)
+                    .then(response => {
+                        console.log('Pie response:', response.data);
+                        this.chartData.datasets[0].data = response.data.count;
+                        this.chartData.labels = response.data.device_model;
+                        
+                        console.log('length = ', this.chartData.labels.length);
+
+                        this.chartData.datasets[0].backgroundColor = this.generateRandomColors(this.chartData.labels.length);
+
+                        console.log(response.data.count);
+                        console.log(response.data.device_model);
+                        console.log(this.chartData);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                
+                const ctx = document.getElementById('pieChart').getContext('2d');
+
+                this.installedDevicePieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: this.chartData,
+                });
+
+
+                await axios.post('http://127.0.0.1:8989/fetchservicelocationbardata', formData)
+                    .then(response => {
+                        console.log('Bar response:', response.data);
+                        this.barChartData.datasets[0].data = response.data.count;
+                        this.barChartData.labels = response.data.location;
+                        
+                        console.log('length = ', this.barChartData.labels.length);
+
+                        this.barChartData.datasets[0].backgroundColor = this.generateRandomColors(this.barChartData.labels.length);
+
+                        console.log(response.data.count);
+                        console.log(response.data.location);
+                        console.log(this.barChartData);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+
+
+
+                const barctx = document.getElementById('barChart').getContext('2d');
+                this.barChart = new Chart(barctx, {
+                    type: 'bar',
+                    data: this.barChartData,
+                });
+            },
+            methods: 
+            {
+                async updateBarChart() {
+                    console.log(this.barChartQueryData);
+
+                    var c_id = document.getElementById('c_id').getAttribute('value');
+                    const formData = new FormData();
+                    formData.append('c_id', c_id);
+                    formData.append('month', this.barChartQueryData.month);
+                    formData.append('year', this.barChartQueryData.year);
+
+
+                    await axios.post('http://127.0.0.1:8989/fetchservicelocationbardata', formData)
+                        .then(response => {
+                            console.log('Bar response:', response.data);
+                            this.barChartData.datasets[0].data = response.data.count;
+                            this.barChartData.labels = response.data.location;
+                            
+                            console.log('length = ', this.barChartData.labels.length);
+
+                            this.barChartData.datasets[0].backgroundColor = this.generateRandomColors(this.barChartData.labels.length);
+
+                            console.log(response.data.count);
+                            console.log(response.data.location);
+                            console.log(this.barChartData);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+
+                        console.log(this.barChartData);
+
+                        if (this.barChart) {
+                            this.barChart.destroy();
+                        }
+
+                        const barctx = document.getElementById('barChart').getContext('2d');
+                        this.barChart = new Chart(barctx, {
+                            type: 'bar',
+                            data: this.barChartData,
+                        });
+
+
+                },
+
+                topClick: function() {
+                    $("html, body").animate({scrollTop: 0}, 1000);
+                },
+
+                submitForm() {
+                    console.log('Form Data:', this.signupFormData);
+
+                    const formData = new FormData();
+                    formData.append('cname', this.signupFormData.name);
+                    formData.append('email', this.signupFormData.email);
+                    formData.append('password', this.signupFormData.password);
+                    formData.append('st_address', this.signupFormData.stAddress);
+                    formData.append('city', this.signupFormData.city);
+                    formData.append('state', this.signupFormData.state);
+                    formData.append('zipcode', this.signupFormData.zipcode);
+
+                    axios.post('http://127.0.0.1:8989/signup', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                generateRandomColors(count) {
+                    const colors = [];
+                    for (let i = 0; i < count; i++) {
+                        const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+                        colors.push(randomColor);
+                    }
+                    return colors;
+                },
+
+                loginForm() {
+                    console.log('Form Data:', this.loginFormData);
+
+                    const formData = new FormData();
+                    formData.append('email', this.loginFormData.email);
+                    formData.append('password', this.loginFormData.password);
+
+                    axios.post('http://127.0.0.1:8989/login', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                logout() {
+                    axios.post('http://127.0.0.1:8989/logout')
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                submitServiceLocationForm() {
+                    console.log('Form Data:', this.serviceLocationFormData);
+
+                    const formData = new FormData();
+                    formData.append('stAddress', this.serviceLocationFormData.stAddress);
+                    formData.append('city', this.serviceLocationFormData.city);
+                    formData.append('state', this.serviceLocationFormData.state);
+                    formData.append('zipcode', this.serviceLocationFormData.zipcode);
+                    formData.append('takeoverDate', this.serviceLocationFormData.takeoverDate);
+                    formData.append('sqFootage', this.serviceLocationFormData.sqFootage);
+                    formData.append('bedroomCount', this.serviceLocationFormData.bedroomCount);
+                    formData.append('occupantCount', this.serviceLocationFormData.occupantCount);
+
+                    axios.post('http://127.0.0.1:8989/servicelocationinsert', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/servicelocations";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                deleteServiceLocation(sl_id)
+                {
+                    const formData = new FormData();
+                    formData.append('sl_id', sl_id);
+
+                    axios.post('http://127.0.0.1:8989/servicelocationdelete', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/servicelocations";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                deviceRedirect(sl_id)
+                {
+                    window.location = "/devices/"+sl_id;
+                }
+
+
+            }
+        })
+
+    </script>
+</body>
+</html>

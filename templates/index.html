@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="{{url_for('static' , filename = 'style.css')}}?q=128049780">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
+
+</head>
+<body>
+    <div id = "app">
+        
+        {% include 'nav.html' %}
+        
+        {% include 'home.html' %}
+
+        {% include 'footer.html' %}
+
+        
+
+    </div>
+
+    <script>
+        var vueObj = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                age : 12,
+                signupFormData: {
+                    name: '',
+                    email: '',
+                    password: '',
+                    stAddress: '',
+                    city: '',
+                    state: '',
+                    zipcode: 0,
+                },
+                loginFormData: {
+                    email: '',
+                    password: ''
+                },
+                baseUrl: null,
+                isEmailValid: true,
+            },
+            mounted() {
+                this.baseUrl = window.location.origin;
+            },
+            methods: 
+            {
+                checkEmailValidity(event) {
+                    console.log("comes here");
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    this.isEmailValid = emailRegex.test(this.signupFormData.email);
+                    console.log(this.isEmailValid);
+                },
+                submitForm() {
+                    console.log('Form Data:', this.signupFormData);
+
+                    const formData = new FormData();
+                    formData.append('cname', this.signupFormData.name);
+                    formData.append('email', this.signupFormData.email);
+                    formData.append('password', this.signupFormData.password);
+                    formData.append('st_address', this.signupFormData.stAddress);
+                    formData.append('city', this.signupFormData.city);
+                    formData.append('state', this.signupFormData.state);
+                    formData.append('zipcode', this.signupFormData.zipcode);
+
+                    axios.post('http://127.0.0.1:8989/signup', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                loginForm() {
+                    console.log('Form Data:', this.loginFormData);
+
+                    const formData = new FormData();
+                    formData.append('email', this.loginFormData.email);
+                    formData.append('password', this.loginFormData.password);
+
+                    axios.post(this.baseUrl + '/login', formData)
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = window.location.origin;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                logout() {
+                    axios.post('http://127.0.0.1:8989/logout')
+                    .then(response => {
+                        console.log('Server Response:', response.data);
+                        window.location = "/";
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+
+                topClick: function() {
+                    $("html, body").animate({scrollTop: 0}, 1000);
+                }
+
+
+            }
+        })
+
+        var options = {
+        strings: ["E N E R G Y &nbsp; C O N S U M P T I O N <br> R E I M A G I N E D <br> with", "D B M S <br> S Y S T E M S"],
+        typeSpeed: 30,
+        backDelay: 3000,
+        loop: true
+        }
+        var typewriterObj = new Typed("#typewriter-content", options);  
+    </script>
+</body>
+</html>
